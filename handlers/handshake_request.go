@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-    util "example.com/modular-music-server/util"
+    "example.com/modular-music-server/util"
 	pb "example.com/modular-music-server/message"
 	proto "google.golang.org/protobuf/proto"
 )

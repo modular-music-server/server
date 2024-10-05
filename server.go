@@ -6,9 +6,12 @@ import (
 
 	"example.com/modular-music-server/handlers"
 	"example.com/modular-music-server/util"
+    "example.com/modular-music-server/config"
 )
 
 func main() {
+    config.Config()
+    return
     // Listen for incoming connections
     listener, err := net.Listen("tcp", "localhost:8080")
     if err != nil {
@@ -32,8 +35,16 @@ func main() {
     }
 }
 
+// type Client struct {
+//     Connection net.Conn
+// }
+//
+// var client Client;
+
 func handleClient(conn net.Conn) {
     defer conn.Close()
+
+    // client.Connection = conn;
 
     for {
         messageType, data, err := util.ReadMessage(conn)
@@ -51,6 +62,8 @@ func handleClient(conn net.Conn) {
             handlers.HandshakeRequest(conn, data)
         case util.MESSAGE_REQUESTLIST:
             handlers.RequestList(conn, data)
+        case util.MESSAGE_REQUESTPROVIDER:
+            handlers.RequestProvider(conn, data)
         }
     }
 

@@ -13,6 +13,8 @@ const (
     MESSAGE_HANDSHAKE_REQUEST MessageType = iota
     MESSAGE_HANDSHAKE_RESPONSE
     MESSAGE_REQUESTLIST
+    MESSAGE_LISTPROVIDERS
+    MESSAGE_REQUESTPROVIDER
 )
 
 func ReadMessage(conn net.Conn) (MessageType, []byte, error) {

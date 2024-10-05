@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"example.com/modular-music-server/util"
 	pb "example.com/modular-music-server/message"
 	proto "google.golang.org/protobuf/proto"
 )
@@ -18,13 +19,30 @@ func RequestList(conn net.Conn, data []byte) {
 
     switch(message.Type) {
     case pb.ListType_PROVIDERS:
-        listProviders()
+        listProviders(conn)
     }
 
     fmt.Printf("Received request list with the following type: ")
     fmt.Println(message.Type);
 }
 
-func listProviders() {
+func listProviders(conn net.Conn) {
+    list := &pb.ListProviders{
+        Providers: []*pb.ProviderEntry{
+            { Id: "youtube", Name: "YouTube" },
+            { Id: "test", Name: "Test" },
+        },
+    }
 
+    data, err := proto.Marshal(list)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    err = util.WriteMessage(conn, util.MESSAGE_LISTPROVIDERS, data)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
 }
