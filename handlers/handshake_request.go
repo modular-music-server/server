@@ -3,24 +3,23 @@ package handlers
 import (
 	"fmt"
 	"log"
-	"net"
 
     "example.com/modular-music-server/util"
 	pb "example.com/modular-music-server/message"
 	proto "google.golang.org/protobuf/proto"
 )
 
-func HandshakeRequest(conn net.Conn, data []byte) {
+func HandshakeRequest(client util.Client, data []byte) {
     var message pb.HandshakeRequest
     if err := proto.Unmarshal(data, &message); err != nil {
         log.Printf("Failed to unmarshal protobuf message: %v", err)
         return
     }
 
-    fmt.Printf("Received handshake request: ")
-    fmt.Println(message.ProtocolVersion)
+    fmt.Printf("Received handshake request: %v\n", message.ProtocolVersion)
 
     if message.ProtocolVersion != util.PROTOCOL_VERSION {
+        fmt.Println("Protocol version does not match. Responding without accepting.")
         response := &pb.HandshakeResponse{
             Accepted: false,
             RejectionReason: "Protocol version not supported",
@@ -31,7 +30,7 @@ func HandshakeRequest(conn net.Conn, data []byte) {
             return
         }
 
-        err = util.WriteMessage(conn, util.MESSAGE_HANDSHAKE_RESPONSE, data)
+        err = util.WriteMessage(client.Connection, util.MESSAGE_HANDSHAKE_RESPONSE, data)
         if err != nil {
             fmt.Println(err)
             return
@@ -47,7 +46,7 @@ func HandshakeRequest(conn net.Conn, data []byte) {
         fmt.Println(err)
         return
     }
-    err = util.WriteMessage(conn, util.MESSAGE_HANDSHAKE_RESPONSE, data)
+    err = util.WriteMessage(client.Connection, util.MESSAGE_HANDSHAKE_RESPONSE, data)
     if err != nil {
         fmt.Println(err)
         return

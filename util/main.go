@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"io"
 	"net"
+
+	"example.com/modular-music-server/config"
 )
 const PROTOCOL_VERSION = "0.0.1"
 
@@ -16,6 +18,12 @@ const (
     MESSAGE_LISTPROVIDERS
     MESSAGE_REQUESTPROVIDER
 )
+
+type Client struct {
+    Connection net.Conn
+    Config *config.Config
+}
+
 
 func ReadMessage(conn net.Conn) (MessageType, []byte, error) {
     messageTypeBuf := make([]byte, 1)

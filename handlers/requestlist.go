@@ -3,14 +3,13 @@ package handlers
 import (
 	"fmt"
 	"log"
-	"net"
 
 	"example.com/modular-music-server/util"
 	pb "example.com/modular-music-server/message"
 	proto "google.golang.org/protobuf/proto"
 )
 
-func RequestList(conn net.Conn, data []byte) {
+func RequestList(client util.Client, data []byte) {
     var message pb.RequestList
     if err := proto.Unmarshal(data, &message); err != nil {
         log.Printf("Failed to unmarshal protobuf message: %v", err)
@@ -19,19 +18,24 @@ func RequestList(conn net.Conn, data []byte) {
 
     switch(message.Type) {
     case pb.ListType_PROVIDERS:
-        listProviders(conn)
+        listProviders(client)
     }
 
     fmt.Printf("Received request list with the following type: ")
     fmt.Println(message.Type);
 }
 
-func listProviders(conn net.Conn) {
+func listProviders(client util.Client) {
+    var providers []*pb.ProviderEntry
+    for _, provider := range client.Config.Modules.Providers {
+        providers = append(providers, &pb.ProviderEntry{
+            Name: provider.Name,
+            Id: provider.Id,
+        })
+    }
+
     list := &pb.ListProviders{
-        Providers: []*pb.ProviderEntry{
-            { Id: "youtube", Name: "YouTube" },
-            { Id: "test", Name: "Test" },
-        },
+        Providers: providers,
     }
 
     data, err := proto.Marshal(list)
@@ -40,7 +44,7 @@ func listProviders(conn net.Conn) {
         return
     }
 
-    err = util.WriteMessage(conn, util.MESSAGE_LISTPROVIDERS, data)
+    err = util.WriteMessage(client.Connection, util.MESSAGE_LISTPROVIDERS, data)
     if err != nil {
         fmt.Println(err)
         return

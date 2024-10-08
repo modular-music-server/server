@@ -9,11 +9,17 @@ import (
     "example.com/modular-music-server/config"
 )
 
+const Port string = "6065"
+
 func main() {
-    config.Config()
-    return
+    config, err := config.LoadConfig()
+    if err != nil {
+        fmt.Printf("Error while loading config: %v\n", err)
+        return
+    }
+
     // Listen for incoming connections
-    listener, err := net.Listen("tcp", "localhost:8080")
+    listener, err := net.Listen("tcp", "localhost:" + Port)
     if err != nil {
         fmt.Println("Error:", err)
         return
@@ -31,20 +37,17 @@ func main() {
         }
 
         // Handle client connection in a goroutine
-        go handleClient(conn)
+        go handleClient(conn, config)
     }
 }
 
-// type Client struct {
-//     Connection net.Conn
-// }
-//
-// var client Client;
+var client util.Client;
 
-func handleClient(conn net.Conn) {
+func handleClient(conn net.Conn, config *config.Config) {
     defer conn.Close()
 
-    // client.Connection = conn;
+    client.Connection = conn;
+    client.Config = config
 
     for {
         messageType, data, err := util.ReadMessage(conn)
@@ -59,11 +62,11 @@ func handleClient(conn net.Conn) {
 
         switch messageType {
         case util.MESSAGE_HANDSHAKE_REQUEST:
-            handlers.HandshakeRequest(conn, data)
+            handlers.HandshakeRequest(client, data)
         case util.MESSAGE_REQUESTLIST:
-            handlers.RequestList(conn, data)
+            handlers.RequestList(client, data)
         case util.MESSAGE_REQUESTPROVIDER:
-            handlers.RequestProvider(conn, data)
+            handlers.RequestProvider(client, data)
         }
     }
 
