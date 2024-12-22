@@ -1,4 +1,4 @@
-module example.com/modular-music-server
+module github.com/modular-music-server/server
 
 go 1.23.0
 
