@@ -60,6 +60,7 @@ func handleClient(conn net.Conn, config *config.Config) {
 			continue
 		}
 
+		fmt.Println("Handling:", messageType)
 		switch messageType {
 		case util.MESSAGE_HANDSHAKE_REQUEST:
 			handlers.HandshakeRequest(client, data)
@@ -67,7 +68,10 @@ func handleClient(conn net.Conn, config *config.Config) {
 			handlers.RequestList(client, data)
 		case util.MESSAGE_REQUESTPROVIDER:
 			handlers.RequestProvider(client, data)
+		case util.MESSAGE_REQUESTFILE:
+			handlers.RequestFile(client, data)
+		default:
+			fmt.Println("Unhandled request type!", messageType)
 		}
 	}
-
 }

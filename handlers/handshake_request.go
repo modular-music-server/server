@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/modular-music-server/server/message"
+	pb "github.com/modular-music-server/protobufs/go"
 	"github.com/modular-music-server/server/util"
 	proto "google.golang.org/protobuf/proto"
 )
@@ -30,7 +30,7 @@ func HandshakeRequest(client util.Client, data []byte) {
 			return
 		}
 
-		err = util.WriteMessage(client.Connection, util.MESSAGE_HANDSHAKE_RESPONSE, data)
+		err = client.WriteMessage(util.MESSAGE_HANDSHAKE_RESPONSE, data)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -46,7 +46,7 @@ func HandshakeRequest(client util.Client, data []byte) {
 		fmt.Println(err)
 		return
 	}
-	err = util.WriteMessage(client.Connection, util.MESSAGE_HANDSHAKE_RESPONSE, data)
+	err = client.WriteMessage(util.MESSAGE_HANDSHAKE_RESPONSE, data)
 	if err != nil {
 		fmt.Println(err)
 		return

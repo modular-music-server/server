@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/modular-music-server/server/message"
+	pb "github.com/modular-music-server/protobufs/go"
 	"github.com/modular-music-server/server/util"
 	proto "google.golang.org/protobuf/proto"
 )
@@ -44,7 +44,7 @@ func listProviders(client util.Client) {
 		return
 	}
 
-	err = util.WriteMessage(client.Connection, util.MESSAGE_LISTPROVIDERS, data)
+	err = client.WriteMessage(util.MESSAGE_LISTPROVIDERS, data)
 	if err != nil {
 		fmt.Println(err)
 		return

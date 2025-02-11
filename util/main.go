@@ -18,6 +18,10 @@ const (
 	MESSAGE_REQUESTLIST
 	MESSAGE_LISTPROVIDERS
 	MESSAGE_REQUESTPROVIDER
+	MESSAGE_PROVIDER
+	MESSAGE_REQUESTFILE
+	MESSAGE_FILEINFO
+	MESSAGE_FILECHUNK
 )
 
 type Client struct {
@@ -49,7 +53,9 @@ func ReadMessage(conn net.Conn) (MessageType, []byte, error) {
 	return MessageType(messageTypeBuf[0]), messageBuf, nil
 }
 
-func WriteMessage(conn net.Conn, messageType MessageType, message []byte) error {
+func (client Client) WriteMessage(messageType MessageType, message []byte) error {
+	conn := client.Connection
+
 	sizeBuf := make([]byte, 4)
 	binary.BigEndian.PutUint32(sizeBuf, uint32(len(message)))
 

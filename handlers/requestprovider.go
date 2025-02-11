@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/modular-music-server/server/message"
+	pb "github.com/modular-music-server/protobufs/go"
 	"github.com/modular-music-server/server/util"
 	proto "google.golang.org/protobuf/proto"
 )
@@ -26,4 +26,22 @@ func RequestProvider(client util.Client, data []byte) {
 	fmt.Println("We have that provider!")
 	fmt.Println(provider)
 
+	providerMessage := &pb.Provider{
+		Id: message.Id,
+		Name: provider.Name,
+		Author: provider.Author,
+		Description: provider.Description,
+	}
+
+	data, err := proto.Marshal(providerMessage)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = client.WriteMessage(util.MESSAGE_PROVIDER, data)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
